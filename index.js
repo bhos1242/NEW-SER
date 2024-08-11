@@ -41,6 +41,8 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
+
+
 db.connect(err => {
     if (err) {
         console.error('Database connection error:', err);
@@ -85,17 +87,21 @@ app.get('/api/products/:id', (req, res) => {
 
 
 app.post('/api/products', upload.single('image'), (req, res) => {
+  console.log('Request body:', req.body); // Log incoming data
+  console.log('Uploaded file:', req.file); // Log file data if present
+
   const { name, price, stock, product_id, left_eye, right_eye } = req.body;
   const image = req.file ? `/uploads/${req.file.filename}` : null;
 
   const sql = 'INSERT INTO products (branch, name, price, stock, product_id, left_eye, right_eye, image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)';
   const values = [1, name, price, stock, product_id, left_eye, right_eye, image];
+  
   db.query(sql, values, (err, results) => {
-      if (err) {
-          console.error('Error adding product:', err);
-          return res.status(500).json({ error: 'Database error' });
-      }
-      res.json({ Status: true, id: results.insertId, message: 'Product added successfully' });
+    if (err) {
+      console.error('Error adding product:', err.message); // Log the detailed error message
+      return res.status(500).json({ error: 'Database error', details: err.message });
+    }
+    res.json({ Status: true, id: results.insertId, message: 'Product added successfully' });
   });
 });
 
