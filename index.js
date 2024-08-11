@@ -41,8 +41,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-
-
 db.connect(err => {
     if (err) {
         console.error('Database connection error:', err);
@@ -100,7 +98,6 @@ app.post('/api/products', upload.single('image'), (req, res) => {
       res.json({ Status: true, id: results.insertId, message: 'Product added successfully' });
   });
 });
-
 
 
 
